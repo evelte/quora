@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='quora',
-      version=version,
+      version=0.1,
       url='http://quora.org',
       description='',
       author='',

@@ -1,2 +1,8 @@
 # you will probably want to have some stuff here! Like logs...
 /logs
+
+*.pkl
+*.csv
+quora.egg-info/
+quora/__pycache__/
+bin/.ipynb_checkpoints/
