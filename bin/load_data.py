@@ -11,6 +11,9 @@ from sklearn.model_selection import train_test_split
 def load_data(name):
     """
     load csv data into dataframe and pickle for quick access
+    two dataframes are stored to disk:
+    1) original data, pickled
+    2) original data with 2 new columns: number of word and number of char count for each question in the pair
     :return:
     """
 
@@ -30,13 +33,21 @@ def load_data(name):
 
 
 def store_all_train_questions():
+    """
+    create and store data series with all training questions (removing nans)
+    :return:
+    """
 
+    # load original dataset from file
     df = pd.read_pickle(os.path.join(quora.root, 'data', 'train.pkl'))
-    df.dropna(inplace=True)
 
-    # concatenate questions
+    # concatenate questions into one data series
     corpus = pd.concat([df.question1, df.question2], axis=0)
 
+    # drop rows with missing question (nan)
+    corpus.dropna(inplace=True)
+
+    # store series to file for easy access
     corpus.to_pickle(os.path.join(quora.root, 'data', 'corpus.pkl'))
 
 
