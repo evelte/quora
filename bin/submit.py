@@ -40,13 +40,15 @@ for chunk, df in df.groupby(np.arange(len(df))//100000):  # chunks of 300,000 wo
 
     # 3. store pre-processed dataframe with test data chunk
     # ------------------------------------------------------------------------------------------------------------------
-    joblib.dump(df, os.path.join(quora.root, 'data', 'submission', 'test_X_chunk{}.pkl'.format(chunk)), compress=True)
+    joblib.dump(dfs, os.path.join(quora.root, 'data', 'submission', 'test_X_chunk{}.pkl'.format(chunk)), compress=True)
 
     # 4. load trained models from file
     # ------------------------------------------------------------------------------------------------------------------
-    rf = joblib.load('model0.pkl')
-    rf_enc = joblib.load('model1.pkl')
-    rf_lm = joblib.load('model2.pkl')
+    path = os.path.join(quora.root, 'data', 'models')
+
+    rf = joblib.load(os.path.join(path, 'model0.pkl'))
+    rf_enc = joblib.load(os.path.join(path, 'model1.pkl'))
+    rf_lm = joblib.load(os.path.join(path, 'model2.pkl'))
 
     # 5. apply models to test data chunk
     # ------------------------------------------------------------------------------------------------------------------
