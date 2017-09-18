@@ -13,9 +13,10 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.pipeline import Pipeline
 import seaborn as sns
 import sys
+from quora.aux_functions import get_cols_with_nans
 
 
-df = pd.read_pickle(os.path.join(quora.root, 'data', 'processed_v6_5000.pkl'))
+df = pd.read_pickle(os.path.join(quora.root, 'data', 'processed_v6_all.pkl'))
 print(df.columns.values)
 
 # these means and stds have to be stored in the metadata
@@ -27,6 +28,12 @@ print(df.columns.values)
 X = df[['similarity', 'word_share', 'overlap', 'diff', 'word_diff', 'char_diff', 'cosine_sim', 'cosine_sim2']]
 y = df['is_duplicate']
 
+# missing cosine distances... they are filled with the average of the column
+print(X.mean())
+X.fillna(X.mean(), inplace=True)
+
+# confirm that there are no nans left
+get_cols_with_nans(X)
 
 # divide into train and validation set (80/20)
 # X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.8, random_state=42)
