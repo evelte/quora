@@ -23,8 +23,6 @@ for chunk, df in df.groupby(np.arange(len(df))//100000):  # chunks of 300,000 wo
     chunk += 1
     print('Processing chunk #{}'.format(chunk))
 
-    if chunk < 11: continue
-
     # 1. extract features from test data | test_id, question1, question2
     # ------------------------------------------------------------------------------------------------------------------
     df = add_some_columns(df)
@@ -52,7 +50,7 @@ for chunk, df in df.groupby(np.arange(len(df))//100000):  # chunks of 300,000 wo
 
     # 5. apply models to test data chunk
     # ------------------------------------------------------------------------------------------------------------------
-    res = rf_lm.predict(rf_enc.transform(rf.apply(X)))
+    res = rf_lm.predict_proba(rf_enc.transform(rf.apply(X_test)))[:, 1]
 
     # 6. construct final dataset | test_id, is_duplicated -- concatenated by columns
     # ------------------------------------------------------------------------------------------------------------------
