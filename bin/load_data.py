@@ -17,14 +17,16 @@ def load_data(name):
     file = os.path.join(quora.root, 'data', '{}.csv'.format(name))
     df = pd.DataFrame.from_csv(file)
 
-    # add columns for word and char counts
-    # df['q1_n_words'] = df['question1'].apply(lambda x: len(x.split(" ")) if isinstance(x, str) else np.nan)
-    # df['q1_n_chars'] = df['question1'].apply(lambda x: len(x) if isinstance(x, str) else np.nan)
-    #
-    # df['q2_n_words'] = df['question2'].apply(lambda x: len(x.split(" ")) if isinstance(x, str) else np.nan)
-    # df['q2_n_chars'] = df['question2'].apply(lambda x: len(x) if isinstance(x, str) else np.nan)
-
     df.to_pickle(os.path.join(quora.root, 'data', '{}.pkl'.format(name)))
+
+    # add columns for word and char counts
+    df['q1_n_words'] = df['question1'].apply(lambda x: len(x.split(" ")) if isinstance(x, str) else np.nan)
+    df['q1_n_chars'] = df['question1'].apply(lambda x: len(x) if isinstance(x, str) else np.nan)
+
+    df['q2_n_words'] = df['question2'].apply(lambda x: len(x.split(" ")) if isinstance(x, str) else np.nan)
+    df['q2_n_chars'] = df['question2'].apply(lambda x: len(x) if isinstance(x, str) else np.nan)
+
+    df.to_pickle(os.path.join(quora.root, 'data', '{}_counts.pkl'.format(name)))
 
 
 def store_all_train_questions():
@@ -56,7 +58,7 @@ if __name__ == '__main__':
 
     # run on complete dataset
     dfs = df
-    dfs = df.head(5000)
+    # dfs = df.head(5000)
     print(dfs.columns.values)
 
     dfs = add_some_columns(dfs)
@@ -70,7 +72,7 @@ if __name__ == '__main__':
 
     print(dfs)
 
-    dfs.to_pickle(os.path.join(quora.root, 'data', 'processed_v6_5000.pkl'))
+    dfs.to_pickle(os.path.join(quora.root, 'data', 'processed_v6_all.pkl'))
 
     elapsed_time = time.time() - start_time
     print('Elapsed time: {}'.format(elapsed_time))
