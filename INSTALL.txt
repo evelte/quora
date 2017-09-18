@@ -1,1 +1,2 @@
-# add instructions for your projects installation here
+# from the project root (e.g home/user/projects/quora/) run:
+pip3 install --editable .
