@@ -109,6 +109,8 @@ def cosine_sim(q1, q2):
 
 def extract_features(q1, q2, vec1, vec2, result=None, log=True):
 
+    # TODO: investigate things like semantic similarity and word order similarity
+
     global processed_rows
 
     q1 = process(q1)
