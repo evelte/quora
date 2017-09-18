@@ -16,7 +16,7 @@ import sys
 from quora.aux_functions import get_cols_with_nans
 
 
-df = pd.read_pickle(os.path.join(quora.root, 'data', 'processed_v6_all.pkl'))
+df = pd.read_pickle(os.path.join(quora.root, 'data', 'processed_v4_all.pkl'))
 print(df.columns.values)
 
 # these means and stds have to be stored in the metadata
@@ -25,7 +25,8 @@ print(df.columns.values)
 
 # X = df[['similarity', 'word_share', 'overlap', 'diff', 'word_diff', 'char_diff', 'cosine_sim']]
 # X = df[['similarity', 'word_share', 'overlap', 'diff', 'cosine_sim']]
-X = df[['similarity', 'word_share', 'overlap', 'diff', 'word_diff', 'char_diff', 'cosine_sim', 'cosine_sim2']]
+# X = df[['similarity', 'word_share', 'overlap', 'diff', 'word_diff', 'char_diff', 'cosine_sim', 'cosine_sim2']]
+X = df[['similarity', 'word_share', 'overlap', 'diff', 'word_diff', 'char_diff', 'cosine_sim']]
 y = df['is_duplicate']
 
 # missing cosine distances... they are filled with the average of the column
@@ -53,13 +54,14 @@ X_train, X_train_lr, y_train, y_train_lr = train_test_split(X_train, y_train, te
 
 # clf = RandomForestClassifier()
 # tuning_params = dict(max_depth=list(range(1,20)), n_estimators=[5, 10, 15, 20, 25])
-# estimator = GridSearchCV(clf, tuning_params)
+# estimator = GridSearchCV(clf, tuning_params, n_jobs=-1, cv=6, scoring='neg_log_loss')
 # estimator.fit(X_train, y_train)
 #
 # print(estimator.best_params_)
 # # {'n_estimators': 20, 'max_depth': 7}
 # # {'n_estimators': 25, 'max_depth': 11}
 #
+# # using log loss as scorer: {'n_estimators': 25, 'max_depth': 13}
 # input()
 
 
@@ -85,6 +87,8 @@ accuracy = rf_lm.score(rf_enc.transform(rf.apply(X_test)), y_test)
 print('accuracy: {}'.format(accuracy))
 
 y_predict = rf_lm.predict(rf_enc.transform(rf.apply(X_test)))
+
+# if I want to set the prediction on my personalized threshold
 y_prediction = [0 if x <0.4 else 1 for x in y_pred_rf_lm]
 
 log_loss = log_loss(y_test, y_pred_rf_lm)
