@@ -1,13 +1,11 @@
-import pandas as pd
-import quora
-import numpy as np
-import warnings
-from quora.wordnet_test import symmetric_sentence_similarity
-from sklearn.feature_extraction.text import TfidfVectorizer
 import nltk, string
-from quora.pre_processing import process
+import warnings
 import spacy
+import numpy as np
 from scipy import spatial
+from sklearn.feature_extraction.text import TfidfVectorizer
+from quora.wordnet_test import symmetric_sentence_similarity
+from quora.pre_processing import process
 
 
 nlp = spacy.load('en')
@@ -17,17 +15,23 @@ remove_punctuation_map = dict((ord(char), None) for char in string.punctuation)
 
 
 def add_some_columns(df):
+    """
+    :param df:
+    :return: dataframe with 2 new columns: q1_feats and q2_feats
+    """
 
+    print('adding columns with vectorized questions')
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
 
+        # there are some nans in the test data...
         vecs1 = [doc.vector for doc in nlp.pipe(df['question1'], n_threads=50)]
-        vecs1 = np.array(vecs1)
-        df['q1_feats'] = list(vecs1)
+        vecs1 = list(np.array(vecs1))
+        df['q1_feats'] = vecs1
 
         vecs2 = [doc.vector for doc in nlp.pipe(df['question2'], n_threads=50)]
-        vecs2 = np.array(vecs2)
-        df['q2_feats'] = list(vecs2)
+        vecs2 = list(np.array(vecs2))
+        df['q2_feats'] = vecs2
 
     return df
 
@@ -92,49 +96,47 @@ vectorizer = TfidfVectorizer(tokenizer=normalize_text, stop_words='english')
 
 
 def cosine_sim(q1, q2):
-    tfidf = vectorizer.fit_transform([q1, q2])
-    return (tfidf * tfidf.T).A[0, 1]
+
+    try:
+        tfidf = vectorizer.fit_transform([q1, q2])
+        cosine_similarity = (tfidf * tfidf.T).A[0, 1]
+    except:
+        # ValueError: ('empty vocabulary; perhaps the documents only contain stop words', 'occurred at index 9581')
+        return 0
+    else:
+        return cosine_similarity
 
 
-def extract_features(q1, q2, vec1, vec2, result):
+def extract_features(q1, q2, vec1, vec2, result=None, log=True):
 
     global processed_rows
 
     q1 = process(q1)
     q2 = process(q2)
 
-    # synsets and similarity
-    s1, s2, similarity = calc_similarity(q1, q2)
-
-    # common words
-    word_share = normalized_word_share(q1, q2)
-
-    # words/chars length difference
-    words_len_diff, char_len_diff = len_diff(q1, q2)
-
-    # intersection and difference of synsets
-    overlap, diff = normalized_synset_share(s1, s2)
-
-    try:
-        c_similarity = cosine_sim(q1, q2)
-    except:
-        # ValueError: ('empty vocabulary; perhaps the documents only contain stop words', 'occurred at index 9581')
-        c_similarity = 0
-
+    s1, s2, similarity = calc_similarity(q1, q2)  # synsets and similarity
+    word_share = normalized_word_share(q1, q2)  # common words
+    words_len_diff, char_len_diff = len_diff(q1, q2)  # words/chars length difference
+    overlap, diff = normalized_synset_share(s1, s2)  # intersection and difference of synsets
+    c_similarity = cosine_sim(q1, q2)
     c_similarity2 = 1 - spatial.distance.cosine(vec1, vec2)
 
-    result = 'Duplicated' if result ==1 else 'No duplicated'
+    # we don't want nans here...
+    if np.isnan(c_similarity2): c_similarity2 = 0.5
 
+    # status update of total number of rows processed
     processed_rows += 1
     print('Processed rows: {}'.format(processed_rows))
-    print('Q1: {}'.format(q1))
-    print('Q2: {}'.format(q2))
-    print('Similarity: {}'.format(similarity))
-    print('Overlap: {}'.format(overlap))
-    print('Diff: {}'.format(diff))
-    print('Cosine sim1: {}'.format(c_similarity))
-    print('Cosine sim2: {}'.format(c_similarity2))
-    print('Result: {}'.format(result))
-    print('\n')
+
+    if log:
+        print('Q1: {}'.format(q1))
+        print('Q2: {}'.format(q2))
+        print('Similarity: {}'.format(similarity))
+        print('Overlap: {}'.format(overlap))
+        print('Diff: {}'.format(diff))
+        print('Cosine sim1: {}'.format(c_similarity))
+        print('Cosine sim2: {}'.format(c_similarity2))
+        print('Result: {}'.format('Duplicated' if result == 1 else 'No duplicated'))
+        print('\n')
 
     return s1, s2, similarity, word_share, overlap, diff, words_len_diff, char_len_diff, c_similarity, c_similarity2
