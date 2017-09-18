@@ -21,7 +21,9 @@ df.fillna("", inplace=True)
 for chunk, df in df.groupby(np.arange(len(df))//100000):  # chunks of 300,000 would allow ~8 equal partitions
 
     chunk += 1
-    print('Processing hunk #{}'.format(chunk))
+    print('Processing chunk #{}'.format(chunk))
+
+    if chunk < 11: continue
 
     # 1. extract features from test data | test_id, question1, question2
     # ------------------------------------------------------------------------------------------------------------------
