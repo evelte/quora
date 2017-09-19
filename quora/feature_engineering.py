@@ -60,6 +60,12 @@ def normalized_word_share(q1, q2):
 
 
 def len_diff(q1, q2):
+    """
+    normalized difference in length
+    :param q1:
+    :param q2:
+    :return:
+    """
 
     n_words1 = len(q1.split(" "))
     n_words2 = len(q2.split(" "))
@@ -67,7 +73,15 @@ def len_diff(q1, q2):
     words_len_diff = abs(n_words1 - n_words2)
     char_len_diff = abs(len(q1) - len(q2))
 
-    return words_len_diff, char_len_diff
+    max_words = max[len(words_len_diff), len(char_len_diff)]
+    if max_words != 0:
+        words_len_diff /= max_words
+
+    max_chars = max[len(q1), len(q2)]
+    if max_words != 0:
+        words_len_diff /= max_words
+
+    return words_len_diff, max_chars
 
 
 def normalized_synset_share(syns1, syns2):
