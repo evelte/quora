@@ -73,15 +73,15 @@ def len_diff(q1, q2):
     words_len_diff = abs(n_words1 - n_words2)
     char_len_diff = abs(len(q1) - len(q2))
 
-    max_words = max[len(words_len_diff), len(char_len_diff)]
+    max_words = max(n_words1, n_words2)
     if max_words != 0:
         words_len_diff /= max_words
 
-    max_chars = max[len(q1), len(q2)]
-    if max_words != 0:
-        words_len_diff /= max_words
+    max_chars = max(len(q1), len(q2))
+    if max_chars != 0:
+        char_len_diff /= max_chars
 
-    return words_len_diff, max_chars
+    return words_len_diff, char_len_diff
 
 
 def normalized_synset_share(syns1, syns2):
