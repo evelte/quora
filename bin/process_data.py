@@ -35,10 +35,11 @@ def process_data():
         warnings.simplefilter("ignore")
 
         dfs['synsets1'], dfs['synsets2'], dfs['similarity'], dfs['word_share'], dfs['overlap'], dfs['diff'], \
-        dfs['word_diff'], dfs['char_diff'], dfs['cosine_sim'], dfs['cosine_sim2'] = zip(*features)
+        dfs['word_diff'], dfs['char_diff'], dfs['cosine_sim'], dfs['cosine_sim2'], dfs['key_share'], dfs['topic_sim']\
+            = zip(*features)
 
     # pickle processed dataframe
-    dfs.to_pickle(os.path.join(quora.root, 'data', 'processed_v6_all.pkl'))
+    dfs.to_pickle(os.path.join(quora.root, 'data', 'processed_v9_all.pkl'))
 
     elapsed_time = time.time() - start_time  # count run time
     print('Elapsed time: {}'.format(elapsed_time))
