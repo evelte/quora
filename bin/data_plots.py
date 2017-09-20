@@ -40,14 +40,14 @@ fig.savefig(os.path.join(path, "word_and_char_count.png"))
 # ----------------------------------------------------------------------------------------------------------------------
 # conditional coloring based on one variable - is_duplicate
 fig, ax = plt.subplots()
-sns.pairplot(df[['similarity', 'word_share', 'overlap', 'diff', 'word_diff', 'char_diff', 'cosine_sim',
-                 'is_duplicate']], hue='is_duplicate')
+sns.pairplot(df[['similarity', 'word_share', 'overlap', 'diff', 'word_diff', 'char_diff', 'cosine_sim', 'key_share',
+                 'topic_sim', 'is_duplicate']], hue='is_duplicate')
 # fig.savefig(os.path.join(path, "pair_plot.png"))
 
 
 # 3. violin plot for extracted features: compare is_duplicate True/False
 # ----------------------------------------------------------------------------------------------------------------------
-cols = ['similarity', 'word_share', 'overlap', 'diff', 'word_diff', 'char_diff', 'cosine_sim']
+cols = ['similarity', 'word_share', 'overlap', 'diff', 'word_diff', 'char_diff', 'cosine_sim', 'key_share', 'topic_sim']
 
 for col in cols:
     fig, ax = plt.subplots()
