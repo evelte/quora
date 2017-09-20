@@ -6,6 +6,10 @@ from scipy import spatial
 from sklearn.feature_extraction.text import TfidfVectorizer
 from quora.wordnet_test import symmetric_sentence_similarity
 from quora.pre_processing import process
+from sklearn.externals import joblib
+import os
+import quora
+from nltk.corpus import wordnet as wn
 
 
 nlp = spacy.load('en')
@@ -107,6 +111,7 @@ def normalize_text(text):
 
 
 vectorizer = TfidfVectorizer(tokenizer=normalize_text, stop_words='english')
+tfidf = joblib.load(os.path.join(quora.root, 'data', 'tfidf2.pkl'))
 
 
 def cosine_sim(q1, q2):
@@ -121,11 +126,100 @@ def cosine_sim(q1, q2):
         return cosine_similarity
 
 
+def get_question_key(question):
+    """
+    these are the key question terms: Who, What, Why, When, Where, How, How Much
+    additionally: None and Mixed
+    :param q1:
+    :param q2:
+    :return:
+    """
+
+    keys = ['who', 'what', 'why', 'when', 'where', 'how', 'which']
+    words = nltk.word_tokenize(question.lower())
+
+    intersect = set(words).intersection(keys)
+    if len(intersect) == 0:
+        key_word = 'None'
+    elif len(intersect) > 1:
+        key_word = 'Mixed'
+    else:
+        key_word = list(intersect)[0]
+
+    return key_word
+
+
+def get_question_key_share(key1, key2):
+
+    if 'None' in [key1, key2] or 'Mixed' in [key1, key2]:
+        key_share = False
+    elif key1 == key2:
+        key_share = True
+    else:
+        key_share = False
+
+    return key_share
+
+
+def topic_similarity(q1, q2):
+
+    def get_top_topic(q):
+        X = tfidf.transform([q])
+        words = nltk.word_tokenize(q.lower())
+
+        t = []
+        for word in words:
+            try:
+                t.append(X[0, tfidf.vocabulary_[word]])
+            except:
+                pass
+
+        # t = [X[0, tfidf.vocabulary_[word]] for word in words]
+        l = len(t) if len(t) < 3 else 3
+        inds = np.argsort(t)[-l:]
+
+        res = []
+        for ind in inds:
+            try:
+                res.append(wn.synsets(words[ind])[0].lemma_names()[0])
+            except:
+                pass
+
+        # [wn.synsets(words[ind])[0].lemma_names()[0] for ind in inds]
+
+        return res, l
+
+    try:
+        top_topic1, l1 = get_top_topic(q1)
+        top_topic2, l2 = get_top_topic(q2)
+
+        overlap = len(set(top_topic1).intersection(top_topic2))/max(l1, l2)
+
+        # dic = {wn.synset(s1[idx]).lemma_names()[0]: X[0, tfidf.vocabulary_[word]]
+        #        for idx, word in enumerate(nltk.word_tokenize(q1.lower()))}
+        #
+        # for key, value in dic.items():
+        #     print(key, value)
+    except:
+        overlap = 0.5
+
+    return overlap
+
+
 def extract_features(q1, q2, vec1, vec2, result=None, log=True):
 
     # TODO: investigate things like semantic similarity and word order similarity
 
     global processed_rows
+
+    # q1 = 'Elena buys new car china wants sell now in england. what is the best way to transport car.'
+    # q2 = 'where to buy red big apples.'
+
+    # get key from raw questions
+    q1_key = get_question_key(q1)
+    q2_key = get_question_key(q2)
+
+    key_share = get_question_key_share(q1_key, q2_key)
 
     q1 = process(q1)
     q2 = process(q2)
@@ -136,6 +230,7 @@ def extract_features(q1, q2, vec1, vec2, result=None, log=True):
     overlap, diff = normalized_synset_share(s1, s2)  # intersection and difference of synsets
     c_similarity = cosine_sim(q1, q2)
     c_similarity2 = 1 - spatial.distance.cosine(vec1, vec2)
+    topic_sim = topic_similarity(q1, q2)
 
     # we don't want nans here...
     if np.isnan(c_similarity2): c_similarity2 = 0.5
@@ -147,12 +242,15 @@ def extract_features(q1, q2, vec1, vec2, result=None, log=True):
     if log:
         print('Q1: {}'.format(q1))
         print('Q2: {}'.format(q2))
+        print('Key share: {}'.format(key_share))
         print('Similarity: {}'.format(similarity))
         print('Overlap: {}'.format(overlap))
         print('Diff: {}'.format(diff))
         print('Cosine sim1: {}'.format(c_similarity))
         print('Cosine sim2: {}'.format(c_similarity2))
+        print('Topic sim: {}'.format(topic_sim))
         print('Result: {}'.format('Duplicated' if result == 1 else 'No duplicated'))
         print('\n')
 
-    return s1, s2, similarity, word_share, overlap, diff, words_len_diff, char_len_diff, c_similarity, c_similarity2
+    return s1, s2, similarity, word_share, overlap, diff, words_len_diff, char_len_diff, c_similarity, c_similarity2, \
+           key_share, topic_sim
