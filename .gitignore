@@ -1,6 +1,8 @@
+# igore all data files
 *.log
 *.pkl
 *.csv
+
 quora.egg-info/
 quora/__pycache__/
 bin/.ipynb_checkpoints/
