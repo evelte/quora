@@ -42,7 +42,7 @@ fig.savefig(os.path.join(path, "word_and_char_count.png"))
 fig, ax = plt.subplots()
 sns.pairplot(df[['similarity', 'word_share', 'overlap', 'diff', 'word_diff', 'char_diff', 'cosine_sim', 'key_share',
                  'topic_sim', 'is_duplicate']], hue='is_duplicate')
-# fig.savefig(os.path.join(path, "pair_plot.png"))
+fig.savefig(os.path.join(path, "pair_plot.png"))
 
 
 # 3. violin plot for extracted features: compare is_duplicate True/False
