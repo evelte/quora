@@ -8,12 +8,14 @@ import re
 
 
 def replacements(text):
+    """
+    replace some predefined
+    :param text:
+    :return:
+    """
 
-    _original = text
-
-    # normalize text as much as possivle
-
-    # text = re.sub(r"[^A-Za-z0-9]", " ", text)
+    # normalize text as much as possible
+    # TODO: apply some spell checking and normalization of abbreviations and country codes
     text = re.sub(r"\'s", " ", text)
     text = re.sub(r"\'ve", " have ", text)
     text = re.sub(r"can't", "cannot ", text)
@@ -74,14 +76,15 @@ def process(text):
 
     text = replacements(text)
 
-    punctuation = list(string.punctuation)
-    # appending reticências (removed while converting to list)
-    punctuation.append('...')
-    to_be_removed = set(stopwords.words('english')+ punctuation)
+    # list of all punctuation to be removed from text
+    punctuation = list(set(string.punctuation))
+    punctuation.append('...')  # appending "reticências" (removed while converting to list)
+
+    # selected punctuation and stopwords are to be removed from text
+    to_be_removed = set(stopwords.words('english') + punctuation)
 
     # without punctuation?
-    tokenized = nltk.word_tokenize(text)
-    filtered =  [word.lower() for word in tokenized if word not in to_be_removed]
+    filtered = [word.lower() for word in nltk.word_tokenize(text) if word not in to_be_removed]
 
     text = ' '.join(filtered)
     return text
