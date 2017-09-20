@@ -10,7 +10,7 @@ import quora
 # ======================================================================================================================
 
 # load processed data
-df = pd.read_pickle(os.path.join(quora.root, 'data', 'processed_v6_all.pkl'))
+df = pd.read_pickle(os.path.join(quora.root, 'data', 'processing', 'processed_v9_all.pkl'))
 
 # drop nans from dataframe
 df.dropna(inplace=True)
