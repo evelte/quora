@@ -18,7 +18,7 @@ def get_cols_with_nans(df):
             print(col, df[col].dtype, 'no missing values')
 
 
-def concatenate_csvs():
+def concatenate_csvs(folder):
     """
     concatenate submission files into one
     loads all csv files from data/submission and concatenates them into one big csv file (saved with timestamp)
@@ -26,7 +26,7 @@ def concatenate_csvs():
     """
 
     try:
-        path = os.path.join(quora.root, 'data', 'submission')
+        path = os.path.join(quora.root, 'data', 'submission', folder)
         df = pd.concat(map(pd.read_csv, glob.glob(os.path.join(path, "*.csv"))))
 
         # make sure the columns have the correct name
