@@ -25,7 +25,7 @@ for chunk, df in df.groupby(np.arange(len(df)) // 100000):  # chunks of 300,000 
     option = 'load'  # CHANGE OPTION HERE! options: load or process
     load_v = 'v3'
     store_v = 'v3'
-    model_v = 'v3'
+    model_v = 'v4'
 
     if option == 'process':  # do not change this
 
