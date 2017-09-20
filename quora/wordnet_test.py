@@ -3,7 +3,13 @@ from nltk.corpus import wordnet as wn
 
 
 def penn_to_wn(tag):
-    """ Convert between a Penn Treebank tag to a simplified Wordnet tag """
+    """
+    Convert between a Penn Treebank tag to a simplified Wordnet tag
+
+    :param tag:
+    :return:
+    """
+
     if tag.startswith('N'):
         return 'n'
 
@@ -31,7 +37,13 @@ def tagged_to_synset(word, tag):
 
 
 def sentence_similarity(sentence1, sentence2):
-    """ compute the sentence similarity using Wordnet """
+    """
+    compute the sentence similarity using Wordnet
+    :param sentence1:
+    :param sentence2:
+    :return:
+    """
+
     # Tokenize and tag
 
     # part of speech tag
@@ -70,30 +82,16 @@ def sentence_similarity(sentence1, sentence2):
     return score, [x.name() for x in synsets1], [x.name() for x in synsets2]
 
 
-sentences = ["Dogs are awesome.",
-             "Some gorgeous creatures are felines.",
-             "Dolphins are swimming mammals.",
-             "Cats are beautiful animals."]
-
-focus_sentence = "Cats are beautiful animals."
-
-# sentence_similarity is not symmetrics!
-
-
 def symmetric_sentence_similarity(sentence1, sentence2):
-    """ compute the symmetric sentence similarity using Wordnet """
+    """
+    compute the symmetric sentence similarity using Wordnet
+
+    :param sentence1:
+    :param sentence2:
+    :return:
+    """
+
     score1, s1, s2 = sentence_similarity(sentence1, sentence2)
     score2, s2, s1 = sentence_similarity(sentence2, sentence1)
 
     return (score1+score2) / 2, s1, s2
-
-# for sentence in sentences:
-#     score1, s1, s2 = symmetric_sentence_similarity(focus_sentence, sentence)
-#     score2, s1, s2 = symmetric_sentence_similarity(sentence, focus_sentence)
-#
-#     print("Similarity(\"%s\", \"%s\") = %s" % (focus_sentence, sentence, score1))
-#     print("Similarity(\"%s\", \"%s\") = %s" % (sentence, focus_sentence, score2))
-#     print(s1)
-#     print(s2)
-#     print('\n')
-
